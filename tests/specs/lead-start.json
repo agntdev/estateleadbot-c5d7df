@@ -1,20 +1,53 @@
 [
   {
-    "name": "Submit a lead",
+    "name": "lead submission reaches confirmation",
     "steps": [
       {
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Start the lead submission process for public users"
+              "text": "What is your name?"
             }
           }
         ],
         "send": {
           "callback": "lead:start"
         }
+      },
+      {
+        "send": { "text": "Alex Morgan" },
+        "expect": [{ "method": "sendMessage", "payload": { "text": "What is the best phone number to reach you? You can type it or share a contact." } }]
+      },
+      {
+        "send": { "text": "+1 (555) 010-1234" },
+        "expect": [{ "method": "sendMessage", "payload": { "text": "What are you interested in?" } }]
+      },
+      {
+        "send": { "callback": "lead:intent:buy" },
+        "expect": [{ "method": "sendMessage", "payload": { "text": "Add a short note about what you need. Keep it under 300 characters." } }]
+      },
+      {
+        "send": { "text": "Looking for a two-bedroom home." },
+        "expect": [{ "method": "sendMessage", "payload": { "text": "Please confirm your details:\n\nName: Alex Morgan\nPhone: +15550101234\nInterest: Buy\nNote: Looking for a two-bedroom home." } }]
       }
+    ]
+  },
+  {
+    "name": "lead note has a 300 character limit",
+    "steps": [
+      { "send": { "callback": "lead:start" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "Alex Morgan" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "+15550101234" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "lead:intent:rent" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "text": "This note is intentionally far too long for the lead form because it repeats the same sentence several times. This note is intentionally far too long for the lead form because it repeats the same sentence several times. This note is intentionally far too long for the lead form because it repeats the same sentence several times. This note is intentionally far too long." }, "expect": [{ "method": "sendMessage", "payload": { "text": "Keep your note to 300 characters or fewer." } }] }
+    ]
+  },
+  {
+    "name": "lead submission can be cancelled",
+    "steps": [
+      { "send": { "callback": "lead:start" }, "expect": [{ "method": "sendMessage" }] },
+      { "send": { "callback": "lead:cancel" }, "expect": [{ "method": "editMessageText", "payload": { "text": "Your lead submission was cancelled." } }] }
     ]
   }
 ]

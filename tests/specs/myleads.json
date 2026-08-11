@@ -1,13 +1,13 @@
 [
   {
-    "name": "/myleads",
+    "name": "/myleads denies access until owner access is configured",
     "steps": [
       {
         "expect": [
           {
             "method": "sendMessage",
             "payload": {
-              "text": "Open the private lead management interface for the owner"
+              "text": "Owner access isn't set up yet."
             }
           }
         ],
