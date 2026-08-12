@@ -1,6 +1,6 @@
 import { Composer } from "grammy";
 import type { Ctx } from "../bot.js";
-import { mainMenuKeyboard } from "../toolkit/index.js";
+import { inlineButton, inlineKeyboard, isOwner, mainMenuKeyboard } from "../toolkit/index.js";
 
 // The /start handler renders the bot's MAIN MENU — the primary way users operate
 // a button-first bot. A feature adds its own button by calling
@@ -11,14 +11,23 @@ const composer = new Composer<Ctx>();
 
 const WELCOME = "Share your property plans and an agent will contact you. Tap 'Submit request' to begin.";
 
+function menuFor(ctx: Ctx) {
+  const menu = mainMenuKeyboard();
+  if (!isOwner(ctx)) return menu;
+  return inlineKeyboard([
+    ...menu.inline_keyboard,
+    [inlineButton("View leads", "view_leads")],
+  ]);
+}
+
 composer.command("start", async (ctx) => {
-  await ctx.reply(WELCOME, { reply_markup: mainMenuKeyboard() });
+  await ctx.reply(WELCOME, { reply_markup: menuFor(ctx) });
 });
 
 // "Back to menu" — re-render the main menu in place from any sub-view.
 composer.callbackQuery("menu:main", async (ctx) => {
   await ctx.answerCallbackQuery();
-  await ctx.editMessageText(WELCOME, { reply_markup: mainMenuKeyboard() });
+  await ctx.editMessageText(WELCOME, { reply_markup: menuFor(ctx) });
 });
 
 export default composer;

@@ -53,6 +53,18 @@ composer.command("myleads", async (ctx) => {
   }
 });
 
+// The owner-only /start menu points here. Keep this route separate from the
+// public menu so a forged callback still passes through the same owner check.
+composer.callbackQuery("view_leads", async (ctx) => {
+  if (!(await ownerOnly(ctx))) return;
+  await ctx.answerCallbackQuery();
+  try {
+    await showPage(ctx, 0, true);
+  } catch {
+    await ctx.editMessageText("Lead storage isn't available yet. Try again shortly.");
+  }
+});
+
 composer.callbackQuery(/^leads:page:\d+$/, async (ctx) => {
   if (!(await ownerOnly(ctx))) return;
   await ctx.answerCallbackQuery();
